@@ -22,6 +22,8 @@ const closedDoorPath = "https://s3.amazonaws.com/codecademy-content/projects/cho
 
 let startButton = document.getElementById('start');
 
+let currentlyPlaying = true;
+
 const randomChoreGenerator = () => {
   let choreDoor = Math.floor((Math.random() * numClosedDoors));
 
@@ -41,32 +43,60 @@ const randomChoreGenerator = () => {
 };
 
 doorImage1.onclick = () => {
-    doorImage1.src = openDoor1;
-    playDoor();
+    if (currentlyPlaying && !isClicked(doorImage1)) {
+        doorImage1.src = openDoor1;
+        playDoor(doorImage1);
+    };
 };
 
 doorImage2.onclick = () => {
-    if (!isClicked(doorImage2)) {
+    if (currentlyPlaying && !isClicked(doorImage2)) {
         doorImage2.src = openDoor2;
-        playDoor();
+        playDoor(doorImage2);
     };
 };
 
 doorImage3.onclick = () => {
-    if (!isClicked(doorImage3)) {
+    if (currentlyPlaying && !isClicked(doorImage3)) {
         doorImage3.src = openDoor3;
-        playDoor();
+        playDoor(doorImage3);
     };
+};
+
+startButton.onclick = () => {
+    if (!currentlyPlaying) {
+        startRound();
+    };
+};
+
+const startRound = () => {
+    doorImage1.src = closedDoorPath;
+    doorImage2.src = closedDoorPath;
+    doorImage3.src = closedDoorPath;
+    numClosedDoors = 3;
+    startButton.innerHTML = "Good luck!";
+    currentlyPlaying = true;
+    randomChoreGenerator();
 };
 
 const gameOver = (status) => {
     if (status === 'win') {
         startButton.innerHTML = "You win! Play again?";
-    };
-
+    } else {
+        startButton.innerHTML = "Game Over! Play again?";
+    }
+    currentlyPlaying = false;
 };
 
-randomChoreGenerator();
+const isBot = (door) => {
+    if (door.src === botDoorPath) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
+startRound();
 
 const isClicked = (door) => {
     if (door.src === closedDoorPath) {
@@ -76,10 +106,14 @@ const isClicked = (door) => {
     }
 };
 
-const playDoor = () => {
+const playDoor = (door) => {
     numClosedDoors--;
     if (numClosedDoors === 0) {
         gameOver('win');
-    }
+    } else if (isBot(door)) {
+        gameOver();
+    } 
 };
+
+
 
